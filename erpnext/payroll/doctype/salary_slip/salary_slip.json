@@ -25,6 +25,7 @@
   "start_date",
   "end_date",
   "salary_structure",
+  "salary_structure_assignment",
   "column_break_18",
   "salary_slip_based_on_timesheet",
   "payroll_frequency",
@@ -486,6 +487,13 @@
    "fieldtype": "Float",
    "hidden": 1,
    "label": "Unmarked days"
+  },
+  {
+   "fieldname": "salary_structure_assignment",
+   "fieldtype": "Link",
+   "label": "Salary Structure Assignment",
+   "options": "Salary Structure Assignment",
+   "read_only": 1
   },
   {
    "fieldname": "section_break_20",
