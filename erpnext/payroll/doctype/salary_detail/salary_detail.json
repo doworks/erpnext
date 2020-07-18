@@ -123,26 +123,27 @@
   },
   {
    "default": "0",
-   "depends_on": "eval:doc.parenttype=='Salary Structure'",
+   "depends_on": "eval:doc.parenttype=='Salary Structure' || doc.parenttype=='Salary Structure Assignment'",
    "fieldname": "amount_based_on_formula",
    "fieldtype": "Check",
    "label": "Amount based on formula"
   },
   {
    "allow_on_submit": 1,
-   "depends_on": "eval:doc.amount_based_on_formula!==0 && doc.parenttype==='Salary Structure'",
+   "depends_on": "eval:doc.amount_based_on_formula!==0 && (doc.parenttype==='Salary Structure' || doc.parenttype==='Salary Structure Assignment')",
    "fieldname": "formula",
    "fieldtype": "Code",
    "in_list_view": 1,
    "label": "Formula"
   },
   {
-   "depends_on": "eval:doc.amount_based_on_formula!==1 || doc.parenttype==='Salary Slip'",
+   "depends_on": "eval:doc.amount_based_on_formula!==1 || doc.parenttype==='Salary Slip' || doc.parenttype==='Salary Structure Assignment'",
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
    "label": "Amount",
-   "options": "Company:company:default_currency"
+   "options": "Company:company:default_currency",
+   "read_only_depends_on": "eval:doc.parenttype==='Salary Structure Assignment' && doc.amount_based_on_formula===1"
   },
   {
    "default": "0",
@@ -211,7 +212,7 @@
  ],
  "istable": 1,
  "links": [],
- "modified": "2020-06-22 23:21:26.300951",
+ "modified": "2020-07-09 14:11:56.154788",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Detail",

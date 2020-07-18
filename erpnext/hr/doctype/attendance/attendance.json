@@ -26,7 +26,11 @@
   "out_time",
   "column_break_18",
   "late_entry",
+  "late_entry_time",
   "early_exit",
+  "early_exit_time",
+  "section_break_23",
+  "logs",
   "amended_from"
  ],
  "fields": [
@@ -74,7 +78,7 @@
    "fieldname": "working_hours",
    "fieldtype": "Float",
    "label": "Working Hours",
-   "precision": "1",
+   "precision": "2",
    "read_only": 1
   },
   {
@@ -199,13 +203,38 @@
   {
    "fieldname": "column_break_18",
    "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.late_entry===1",
+   "description": "In Minutes",
+   "fieldname": "late_entry_time",
+   "fieldtype": "Int",
+   "label": "Late Entry Time"
+  },
+  {
+   "depends_on": "eval:doc.early_exit===1",
+   "description": "In Minutes",
+   "fieldname": "early_exit_time",
+   "fieldtype": "Int",
+   "label": "Early Exit Time"
+  },
+  {
+   "fieldname": "section_break_23",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "logs",
+   "fieldtype": "Table",
+   "label": "Logs",
+   "options": "Checkin Log Item",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-ok",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-05-29 13:51:37.177231",
+ "modified": "2020-07-16 08:56:54.045289",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",
