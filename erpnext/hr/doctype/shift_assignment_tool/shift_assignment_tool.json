@@ -1,0 +1,133 @@
+{
+ "actions": [],
+ "allow_copy": 1,
+ "creation": "2020-07-13 14:53:42.559141",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "employees",
+  "shift_pattern",
+  "unit_of_cycle",
+  "column_break_4",
+  "company",
+  "section_break_3",
+  "from_date",
+  "generate_view",
+  "column_break_5",
+  "to_date",
+  "column_break_8",
+  "start_from_day",
+  "section_break_7",
+  "shift_pattern_view"
+ ],
+ "fields": [
+  {
+   "fieldname": "employees",
+   "fieldtype": "Table MultiSelect",
+   "label": "Employees",
+   "options": "Employee Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "shift_pattern",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Shift Pattern",
+   "options": "Shift Pattern",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_3",
+   "fieldtype": "Section Break",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_7",
+   "fieldtype": "Section Break",
+   "hide_border": 1
+  },
+  {
+   "fieldname": "shift_pattern_view",
+   "fieldtype": "Table",
+   "label": "Shift Pattern View",
+   "options": "Shift Pattern View Item",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "shift_pattern.unit_of_cycle",
+   "fieldname": "unit_of_cycle",
+   "fieldtype": "Data",
+   "label": "Unit of Cycle",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.unit_of_cycle==='Day'",
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.unit_of_cycle==='Day'",
+   "fieldname": "start_from_day",
+   "fieldtype": "Int",
+   "label": "Start From Day"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "From Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "To Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "generate_view",
+   "fieldtype": "Button",
+   "label": "Generate View"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  }
+ ],
+ "hide_toolbar": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2020-07-14 11:47:10.840390",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Shift Assignment Tool",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
