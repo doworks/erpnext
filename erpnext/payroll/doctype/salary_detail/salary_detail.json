@@ -129,21 +129,18 @@
   },
   {
    "default": "0",
-   "depends_on": "eval:doc.parenttype=='Salary Structure'",
    "fieldname": "amount_based_on_formula",
    "fieldtype": "Check",
    "label": "Amount based on formula"
   },
   {
    "allow_on_submit": 1,
-   "depends_on": "eval:doc.amount_based_on_formula!==0 && doc.parenttype==='Salary Structure'",
    "fieldname": "formula",
    "fieldtype": "Code",
    "in_list_view": 1,
    "label": "Formula"
   },
   {
-   "depends_on": "eval:doc.amount_based_on_formula!==1 || doc.parenttype==='Salary Slip'",
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
