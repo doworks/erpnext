@@ -24,6 +24,7 @@
   "start_date",
   "end_date",
   "salary_structure",
+  "salary_structure_assignment",
   "payroll_frequency",
   "column_break_15",
   "total_working_days",
@@ -118,9 +119,7 @@
    "fieldtype": "Link",
    "label": "Designation",
    "oldfieldname": "designation",
-   "oldfieldtype": "Link",
-   "options": "Designation",
-   "read_only": 1
+   "oldfieldtype": "Link"
   },
   {
    "fetch_from": "employee.branch",
@@ -490,13 +489,20 @@
    "fieldtype": "Float",
    "hidden": 1,
    "label": "Unmarked days"
+  },
+  {
+   "fieldname": "salary_structure_assignment",
+   "fieldtype": "Link",
+   "label": "Salary Structure Assignment",
+   "options": "Salary Structure Assignment",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 9,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-07-22 12:41:03.659422",
+ "modified": "2020-07-09 14:37:11.152102",
  "modified_by": "Administrator",
  "module": "Payroll",
  "name": "Salary Slip",

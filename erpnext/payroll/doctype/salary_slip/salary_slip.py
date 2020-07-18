@@ -29,7 +29,9 @@ class SalarySlip(TransactionBase):
 			"long": int,
 			"round": round,
 			"date": datetime.date,
-			"getdate": getdate
+			"getdate": getdate,
+			"date_diff": date_diff,
+			"str": str
 		}
 
 	def autoname(self):
@@ -116,7 +118,7 @@ class SalarySlip(TransactionBase):
 			self.end_date = date_details.end_date
 
 	def get_emp_and_working_day_details(self):
-		'''First time, load all the components from salary structure'''
+		'''First time, load all the components from salary structure assignment'''
 		if self.employee:
 			self.set("earnings", [])
 			self.set("deductions", [])
@@ -129,13 +131,14 @@ class SalarySlip(TransactionBase):
 
 			#getin leave details
 			self.get_working_days_details(joining_date, relieving_date)
-			struct = self.check_sal_struct(joining_date, relieving_date)
+			structure_assignment = self.check_sal_struct(joining_date, relieving_date)
 
-			if struct:
-				self._salary_structure_doc = frappe.get_doc('Salary Structure', struct)
-				self.salary_slip_based_on_timesheet = self._salary_structure_doc.salary_slip_based_on_timesheet or 0
+			if structure_assignment:
+				self._salary_structure_assignment_doc = frappe.get_doc('Salary Structure Assignment', structure_assignment)
+				self._salary_structure_doc = frappe.get_doc('Salary Structure', self._salary_structure_assignment_doc.salary_structure)
+				self.salary_slip_based_on_timesheet = frappe.get_value("Salary Structure", self._salary_structure_assignment_doc.salary_structure, "salary_slip_based_on_timesheet") or 0
 				self.set_time_sheet()
-				self.pull_sal_struct()
+				self.pull_sal_structure_assignment()
 				consider_unmarked_attendance_as = frappe.db.get_value("Payroll Settings", None, "consider_unmarked_attendance_as") or "Present"
 				return consider_unmarked_attendance_as
 
@@ -158,7 +161,7 @@ class SalarySlip(TransactionBase):
 			cond += """and ss.payroll_frequency = '%(payroll_frequency)s'""" % {"payroll_frequency": self.payroll_frequency}
 
 		st_name = frappe.db.sql("""
-			select sa.salary_structure
+			select sa.name
 			from `tabSalary Structure Assignment` sa join `tabSalary Structure` ss
 			where sa.salary_structure=ss.name
 				and sa.docstatus = 1 and ss.docstatus = 1 and ss.is_active ='Yes' %s
@@ -168,26 +171,27 @@ class SalarySlip(TransactionBase):
 			'end_date': self.end_date, 'joining_date': joining_date})
 
 		if st_name:
-			self.salary_structure = st_name[0][0]
-			return self.salary_structure
+			self.salary_structure_assignment = st_name[0][0]
+			return self.salary_structure_assignment
 
 		else:
-			self.salary_structure = None
-			frappe.msgprint(_("No active or default Salary Structure found for employee {0} for the given dates")
-				.format(self.employee), title=_('Salary Structure Missing'))
+			self.salary_structure_assignment = None
+			frappe.msgprint(_("No active or default Salary Structure Assignment found for employee {0} for the given dates")
+				.format(self.employee), title=_('Salary Structure Assignment Missing'))
 
-	def pull_sal_struct(self):
-		from erpnext.payroll.doctype.salary_structure.salary_structure import make_salary_slip
+	def pull_sal_structure_assignment(self):
+		from erpnext.payroll.doctype.salary_structure_assignment.salary_structure_assignment import make_salary_slip
 
 		if self.salary_slip_based_on_timesheet:
 			self.salary_structure = self._salary_structure_doc.name
+			self.salary_structure_assignment = self._salary_structure_assignment_doc.name
 			self.hour_rate = self._salary_structure_doc.hour_rate
 			self.total_working_hours = sum([d.working_hours or 0.0 for d in self.timesheets]) or 0.0
 			wages_amount = self.hour_rate * self.total_working_hours
 
 			self.add_earning_for_hourly_wages(self, self._salary_structure_doc.salary_component, wages_amount)
 
-		make_salary_slip(self._salary_structure_doc.name, self)
+		make_salary_slip(self._salary_structure_assignment_doc.name, self)
 
 	def get_working_days_details(self, joining_date=None, relieving_date=None, lwp=None, for_preview=0):
 		payroll_based_on = frappe.db.get_value("Payroll Settings", None, "payroll_based_on")
@@ -388,11 +392,11 @@ class SalarySlip(TransactionBase):
 			doc.append('earnings', wages_row)
 
 	def calculate_net_pay(self):
-		if self.salary_structure:
+		if self.salary_structure_assignment:
 			self.calculate_component_amounts("earnings")
 		self.gross_pay = self.get_component_totals("earnings")
 
-		if self.salary_structure:
+		if self.salary_structure_assignment:
 			self.calculate_component_amounts("deductions")
 		self.total_deduction = self.get_component_totals("deductions")
 
@@ -402,8 +406,8 @@ class SalarySlip(TransactionBase):
 		self.rounded_total = rounded(self.net_pay)
 
 	def calculate_component_amounts(self, component_type):
-		if not getattr(self, '_salary_structure_doc', None):
-			self._salary_structure_doc = frappe.get_doc('Salary Structure', self.salary_structure)
+		if not getattr(self, '_salary_structure_assignmebt_doc', None):
+			self._salary_structure_assignmebt_doc = frappe.get_doc('Salary Structure Assignment', self.salary_structure_assignment)
 
 		payroll_period = get_payroll_period(self.start_date, self.end_date, self.company)
 
@@ -418,7 +422,7 @@ class SalarySlip(TransactionBase):
 
 	def add_structure_components(self, component_type):
 		data = self.get_data_for_eval()
-		for struct_row in self._salary_structure_doc.get(component_type):
+		for struct_row in self._salary_structure_assignment_doc.get(component_type):
 			amount = self.eval_condition_and_formula(struct_row, data)
 			if amount and struct_row.statistical_component == 0:
 				self.update_component_row(struct_row, amount, component_type)
