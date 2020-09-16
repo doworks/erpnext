@@ -101,6 +101,49 @@ frappe.ui.form.on("Fees", {
 					}
 				}
 			});
+
+			if (frm.doc.student_fee_structure) {
+				frm.set_value("fee_components" ,"");
+				frappe.call({
+					method: "erpnext.education.api.get_student_fee_components",
+					args: {
+						"student_fee_structure": frm.doc.student_fee_structure
+					},
+					callback: function(r) {
+						if (r.message) {
+							frappe.call({
+								method: "frappe.client.get",
+								args: {
+										doctype: "Student",
+										name: frm.doc.student,
+								},
+								callback(response) {
+									if(response.message) {
+										var student_doc = response.message;
+										$.each(r.message, function(i, d) {
+											if( (d.student_category && d.student_category == student_doc.category && !d.is_transport)
+												|| (d.student_category && d.student_category == student_doc.category && d.is_transport && (student_doc.transportation == "باص المدرسة" || student_doc.transportation == "School Bus"))
+												|| (!d.student_category && d.is_transport && (student_doc.transportation == "باص المدرسة" || student_doc.transportation == "School Bus"))
+												|| (!d.student_category && !d.is_transport) )
+											{
+												var row = frappe.model.add_child(frm.doc, "Student Fee Component", "fee_components");
+												row.student_category = d.student_category;
+												row.fees_category = d.fees_category;
+												row.description = d.description;
+												row.amount = d.amount;
+												row.is_transport = d.is_transport;
+												refresh_field("fee_components");
+											}
+										});
+									}
+								}
+							});
+						}
+						refresh_field("fee_components");
+						frm.trigger("calculate_total_amount");
+					}
+				});
+			}
 		}
 	},
 
@@ -173,10 +216,56 @@ frappe.ui.form.on("Fees", {
 		}
 	},
 
+	student_fee_structure: function(frm) {
+		frm.set_value("fee_components" ,"");
+		if (frm.doc.student_fee_structure) {
+			frappe.call({
+				method: "erpnext.education.api.get_student_fee_components",
+				args: {
+					"student_fee_structure": frm.doc.student_fee_structure
+				},
+				callback: function(r) {
+					if (r.message) {
+						frappe.call({
+							method: "frappe.client.get",
+							args: {
+									doctype: "Student",
+									name: frm.doc.student,
+							},
+							callback(response) {
+								if(response.message) {
+									var student_doc = response.message;
+									$.each(r.message, function(i, d) {
+										if( (d.student_category && d.student_category == student_doc.category && !d.is_transport)
+											|| (d.student_category && d.student_category == student_doc.category && d.is_transport && (student_doc.transportation == "باص المدرسة" || student_doc.transportation == "School Bus"))
+											|| (!d.student_category && d.is_transport && (student_doc.transportation == "باص المدرسة" || student_doc.transportation == "School Bus"))
+											|| (!d.student_category && !d.is_transport) )
+										{
+											var row = frappe.model.add_child(frm.doc, "Student Fee Component", "fee_components");
+											row.student_category = d.student_category;
+											row.fees_category = d.fees_category;
+											row.description = d.description;
+											row.amount = d.amount;
+											row.is_transport = d.is_transport;
+											refresh_field("fee_components");
+										}
+									});
+									frm.trigger("calculate_total_amount");
+								}
+							}
+						});
+					}
+					refresh_field("fee_components");
+					frm.trigger("calculate_total_amount");
+				}
+			});
+		}
+	},
+
 	calculate_total_amount: function(frm) {
 		var grand_total = 0;
-		for(var i=0;i<frm.doc.components.length;i++) {
-			grand_total += frm.doc.components[i].amount;
+		for(var i=0;i<frm.doc.fee_components.length;i++) {
+			grand_total += frm.doc.fee_components[i].amount;
 		}
 		frm.set_value("grand_total", grand_total);
 	}

@@ -174,7 +174,7 @@ def get_shift_details(shift_type_name, for_date=nowdate()):
 		start_date = for_date - timedelta(days=1) if shift_type.calculate_attendance_date_as_per == "Check-out" else for_date
 	start_datetime = datetime.combine(start_date, datetime.min.time()) + shift_type.start_time
 	end_date = for_date + timedelta(days=1) if shift_type.start_time > shift_type.end_time else for_date
-	if shift_type.in_two_days:
+	if shift_type.in_two_days and shift_type.calculate_attendance_date_as_per == "Check-out":
 		end_date = for_date
 	end_datetime = datetime.combine(end_date, datetime.min.time()) + shift_type.end_time
 	actual_start = start_datetime - timedelta(minutes=shift_type.begin_check_in_before_shift_start_time)

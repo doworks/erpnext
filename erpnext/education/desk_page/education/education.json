@@ -58,7 +58,7 @@
   {
    "hidden": 0,
    "label": "Fees",
-   "links": "[\n    {\n        \"label\": \"Fees\",\n        \"name\": \"Fees\",\n        \"type\": \"doctype\"\n    },\n    {\n        \"label\": \"Fee Schedule\",\n        \"name\": \"Fee Schedule\",\n        \"type\": \"doctype\"\n    },\n    {\n        \"label\": \"Fee Structure\",\n        \"name\": \"Fee Structure\",\n        \"type\": \"doctype\"\n    },\n    {\n        \"label\": \"Fee Category\",\n        \"name\": \"Fee Category\",\n        \"type\": \"doctype\"\n    }\n]"
+   "links": "[\n    {\n        \"label\": \"Fees\",\n        \"name\": \"Fees\",\n        \"type\": \"doctype\"\n    },\n    {\n        \"label\": \"Student Fee Schedule\",\n        \"name\": \"Student Fee Schedule\",\n        \"type\": \"doctype\"\n    },\n    {\n        \"label\": \"Student Fee Structure\",\n        \"name\": \"Student Fee Structure\",\n        \"type\": \"doctype\"\n    },\n    {\n        \"label\": \"Fee Category\",\n        \"name\": \"Fee Category\",\n        \"type\": \"doctype\"\n    }\n]"
   },
   {
    "hidden": 0,

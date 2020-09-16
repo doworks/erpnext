@@ -200,7 +200,8 @@ def get_balance_on(account=None, date=None, party_type=None, party=None, company
 		bal = frappe.db.sql("""
 			SELECT {0}
 			FROM `tabGL Entry` gle
-			WHERE {1}""".format(select_field, " and ".join(cond)))[0][0]
+			WHERE {1}
+			AND is_cancelled = 0""".format(select_field, " and ".join(cond)))[0][0]
 
 		# if bal is None, return 0
 		return flt(bal)
@@ -687,6 +688,7 @@ def get_outstanding_invoices(party_type, party, account, condition=None, filters
 			and ((voucher_type = 'Journal Entry'
 					and (against_voucher = '' or against_voucher is null))
 				or (voucher_type not in ('Journal Entry', 'Payment Entry')))
+			and is_cancelled = 0
 		group by voucher_type, voucher_no
 		order by posting_date, name""".format(
 			dr_or_cr=dr_or_cr,
@@ -705,6 +707,7 @@ def get_outstanding_invoices(party_type, party, account, condition=None, filters
 			and account = %(account)s
 			and {payment_dr_or_cr} > 0
 			and against_voucher is not null and against_voucher != ''
+			and is_cancelled = 0
 		group by against_voucher_type, against_voucher
 	""".format(payment_dr_or_cr=payment_dr_or_cr), {
 		"party_type": party_type,

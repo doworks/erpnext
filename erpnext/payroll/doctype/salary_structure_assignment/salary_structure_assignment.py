@@ -5,7 +5,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-from frappe.utils import getdate, flt, cint, cstr
+from frappe.utils import getdate, flt, cint, cstr, date_diff
 from frappe.model.document import Document
 import datetime
 from frappe.model.mapper import get_mapped_doc
@@ -49,6 +49,8 @@ class SalaryStructureAssignment(Document):
 
 		#Get Data for Evaluation
 		data = self.get_data_for_eval()
+		data.setdefault("end_date", frappe.utils.nowdate())
+		data.update(frappe.get_doc("Employee", self.employee).as_dict())
 
 		#Define Totals
 		total_earning = 0
@@ -99,8 +101,10 @@ class SalaryStructureAssignment(Document):
 			"float": float,
 			"long": int,
 			"round": round,
+			"getdate": getdate,
 			"date": datetime.date,
-			"getdate": getdate
+			"date_diff": date_diff,
+			"str": str
 		}
 
 		try:
@@ -175,3 +179,18 @@ def make_salary_slip(source_name, target_doc = None, employee = None, as_print =
 		return frappe.get_print(doc.doctype, doc.name, doc = doc, print_format = print_format)
 	else:
 		return doc
+
+@frappe.whitelist()
+def get_salary_structure_details(salary_structure):
+    ss_doc = frappe.get_doc("Salary Structure", salary_structure)
+
+    earnings = []
+    deductions = []
+
+    for earning in ss_doc.earnings:
+        earnings.append(earning)
+
+    for deduction in ss_doc.deductions:
+        deductions.append(deduction)
+
+    return frappe._dict({"earnings": earnings, "deductions": deductions})

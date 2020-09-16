@@ -217,14 +217,15 @@
    "fieldtype": "Link",
    "label": "Fee Structure",
    "options": "Fee Structure",
-   "print_hide": 1
+   "print_hide": 1,
+   "read_only": 1
   },
   {
    "fieldname": "components",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Components",
-   "options": "Fee Component",
-   "reqd": 1
+   "options": "Fee Component"
   },
   {
    "fieldname": "section_break_10",
@@ -254,7 +255,6 @@
    "fieldname": "grand_total_in_words",
    "fieldtype": "Data",
    "label": "In Words",
-   "length": 240,
    "read_only": 1
   },
   {
@@ -339,7 +339,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2020-07-18 05:00:00.621010",
+ "modified": "2020-09-17 01:47:50.108991",
  "modified_by": "Administrator",
  "module": "Education",
  "name": "Fees",

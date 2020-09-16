@@ -13,7 +13,7 @@
   {
    "hidden": 0,
    "label": "Shift Management",
-   "links": "[\n    {\n        \"label\": \"Shift Type\",\n        \"name\": \"Shift Type\",\n        \"type\": \"doctype\"\n    },\n    {\n        \"label\": \"Shift Request\",\n        \"name\": \"Shift Request\",\n        \"type\": \"doctype\"\n    },\n    {\n        \"label\": \"Shift Assignment\",\n        \"name\": \"Shift Assignment\",\n        \"type\": \"doctype\"\n    }\n]"
+   "links": "[\n    {\n        \"label\": \"Shift Type\",\n        \"name\": \"Shift Type\",\n        \"type\": \"doctype\"\n    },\n    {\n        \"label\": \"Shift Request\",\n        \"name\": \"Shift Request\",\n        \"type\": \"doctype\"\n    },\n    {\n        \"label\": \"Shift Assignment\",\n        \"name\": \"Shift Assignment\",\n        \"type\": \"doctype\"\n    },\n    {\n        \"label\": \"Shift pattern\",\n        \"name\": \"Shift Pattern\",\n        \"type\": \"doctype\"\n    },\n    {\n        \"label\": \"Shift Assignment Tool\",\n        \"name\": \"Shift Assignment Tool\",\n        \"type\": \"doctype\"\n    }\n]"
   },
   {
    "hidden": 0,
