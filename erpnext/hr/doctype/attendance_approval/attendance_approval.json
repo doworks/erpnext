@@ -13,6 +13,7 @@
   "branch",
   "section_break_6",
   "attendance_display",
+  "attendance_data",
   "amended_from"
  ],
  "fields": [
@@ -63,12 +64,18 @@
    "options": "Attendance Approval",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "attendance_data",
+   "fieldtype": "Code",
+   "hidden": 1,
+   "label": "Attendance Data"
   }
  ],
  "hide_toolbar": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-07-17 20:50:34.805232",
+ "modified": "2020-08-12 18:07:59.856059",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance Approval",
@@ -88,6 +95,5 @@
   }
  ],
  "sort_field": "modified",
- "sort_order": "DESC",
- "track_changes": 1
+ "sort_order": "DESC"
 }

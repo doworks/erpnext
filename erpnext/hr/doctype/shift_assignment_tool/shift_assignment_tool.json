@@ -55,8 +55,7 @@
    "fieldname": "shift_pattern_view",
    "fieldtype": "Table",
    "label": "Shift Pattern View",
-   "options": "Shift Pattern View Item",
-   "read_only": 1
+   "options": "Shift Pattern View Item"
   },
   {
    "fetch_from": "shift_pattern.unit_of_cycle",
@@ -110,7 +109,7 @@
  "hide_toolbar": 1,
  "issingle": 1,
  "links": [],
- "modified": "2020-07-14 11:47:10.840390",
+ "modified": "2020-08-19 10:40:04.536584",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Shift Assignment Tool",

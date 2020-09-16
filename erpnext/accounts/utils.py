@@ -670,11 +670,11 @@ def get_outstanding_invoices(party_type, party, account, condition=None, filters
 		where
 			party_type = %(party_type)s and party = %(party)s
 			and account = %(account)s and {dr_or_cr} > 0
-			and is_cancelled=0
 			{condition}
 			and ((voucher_type = 'Journal Entry'
 					and (against_voucher = '' or against_voucher is null))
 				or (voucher_type not in ('Journal Entry', 'Payment Entry')))
+			and is_cancelled = 0
 		group by voucher_type, voucher_no
 		order by posting_date, name""".format(
 			dr_or_cr=dr_or_cr,

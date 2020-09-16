@@ -1191,6 +1191,10 @@ def get_advance_payment_entries(party_type, party, party_account, order_doctype,
 													  [party_account, payment_type, party_type, party,
 													   order_doctype] + order_list, as_dict=1)
 
+	if party_type == "Student":
+		party_account_field = "paid_from"
+		payment_type = "Receive"
+
 	if include_unallocated:
 		unallocated_payment_entries = frappe.db.sql("""
 				select "Payment Entry" as reference_type, name as reference_name,

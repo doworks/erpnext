@@ -26,7 +26,6 @@
   "accounting_dimensions_section",
   "cost_center",
   "dimension_col_break",
-  "project",
   "supplier_invoice_details",
   "bill_no",
   "column_break_15",
@@ -349,6 +348,7 @@
    "label": "Supplier Invoice Details"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "bill_no",
    "fieldtype": "Data",
    "label": "Supplier Invoice No",
@@ -858,7 +858,6 @@
    "fieldname": "base_in_words",
    "fieldtype": "Data",
    "label": "In Words (Company Currency)",
-   "length": 240,
    "oldfieldname": "in_words",
    "oldfieldtype": "Data",
    "print_hide": 1,
@@ -904,7 +903,6 @@
    "fieldname": "in_words",
    "fieldtype": "Data",
    "label": "In Words",
-   "length": 240,
    "oldfieldname": "in_words_import",
    "oldfieldtype": "Data",
    "print_hide": 1,

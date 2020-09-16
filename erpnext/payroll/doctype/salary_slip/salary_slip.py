@@ -50,6 +50,8 @@ class SalarySlip(TransactionBase):
 			# get details from salary structure
 			self.get_emp_and_working_day_details()
 		else:
+			self._salary_structure_assignment_doc = frappe.get_doc('Salary Structure Assignment', self.salary_structure_assignment)
+			self._salary_structure_doc = frappe.get_doc('Salary Structure', self.salary_structure)
 			self.get_working_days_details(lwp = self.leave_without_pay)
 
 		self.calculate_net_pay()
@@ -489,9 +491,10 @@ class SalarySlip(TransactionBase):
 			self.add_tax_components(payroll_period)
 
 	def add_structure_components(self, component_type):
-		data = self.get_data_for_eval()
+		if not self.get("_data"):
+			self._data = self.get_data_for_eval()
 		for struct_row in self._salary_structure_assignment_doc.get(component_type):
-			amount = self.eval_condition_and_formula(struct_row, data)
+			amount = self.eval_condition_and_formula(struct_row, self._data)
 			if amount and struct_row.statistical_component == 0:
 				self.update_component_row(struct_row, amount, component_type)
 
@@ -576,13 +579,14 @@ class SalarySlip(TransactionBase):
 				get_salary_component_data(additional_salary.component),
 				additional_salary.amount,
 				component_type,
-				additional_salary
+				additional_salary,
+				additional_salary.quantity
 			)
 
 	def add_tax_components(self, payroll_period):
 		# Calculate variable_based_on_taxable_salary after all components updated in salary slip
 		tax_components, other_deduction_components = [], []
-		for d in self._salary_structure_doc.get("deductions"):
+		for d in self._salary_structure_assignment_doc.get("deductions"):
 			if d.variable_based_on_taxable_salary == 1 and not d.formula and not flt(d.amount):
 				tax_components.append(d.salary_component)
 			else:
@@ -597,7 +601,7 @@ class SalarySlip(TransactionBase):
 			tax_row = get_salary_component_data(d)
 			self.update_component_row(tax_row, tax_amount, "deductions")
 
-	def update_component_row(self, component_data, amount, component_type, additional_salary=None):
+	def update_component_row(self, component_data, amount, component_type, additional_salary=None, quantity=0):
 		component_row = None
 		for d in self.get(component_type):
 			if d.salary_component != component_data.salary_component:
@@ -650,6 +654,7 @@ class SalarySlip(TransactionBase):
 				component_data.deduct_full_tax_on_selected_payroll_date
 
 		component_row.amount = amount
+		component_row.quantity = quantity
 
 	def calculate_variable_based_on_taxable_salary(self, tax_component, payroll_period):
 		if not payroll_period:

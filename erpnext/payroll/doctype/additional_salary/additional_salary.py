@@ -86,7 +86,7 @@ def get_additional_salaries(employee, start_date, end_date, component_type):
 	additional_salary_list = frappe.db.sql("""
 		select name, salary_component as component, type, amount,
 		overwrite_salary_structure_amount as overwrite,
-		deduct_full_tax_on_selected_payroll_date
+		deduct_full_tax_on_selected_payroll_date, quantity
 		from `tabAdditional Salary`
 		where employee=%(employee)s
 			and docstatus = 1

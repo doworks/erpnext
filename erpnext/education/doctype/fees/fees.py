@@ -65,7 +65,7 @@ class Fees(AccountsController):
 	def calculate_total(self):
 		"""Calculates total amount."""
 		self.grand_total = 0
-		for d in self.components:
+		for d in self.fee_components:
 			self.grand_total += d.amount
 		self.outstanding_amount = self.grand_total
 		self.grand_total_in_words = money_in_words(self.grand_total)

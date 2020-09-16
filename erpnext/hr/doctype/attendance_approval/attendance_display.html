@@ -1,0 +1,35 @@
+{% if data %}
+    <table class="table table-bordered small">
+        <thead>
+            <tr>
+                <th style="min-width: 200px;"></th>
+                {% for title in titles %}
+                    <th style="min-width: 80px;">{{ title }}</th>
+                {% endfor %}
+            </tr>
+
+        </thead>
+        <tbody>
+            {% for item in data %}
+                <tr>
+                    <td>{{ item.employee["employee_name"] }}</td>
+                    {% for attendance in item.attendance %}
+                        <td style="background-color: {{ attendance["bg_color"] }}; color: {{ attendance["color"] }}; text-align: center;">
+                            {% if attendance["attendance_status"] == "On Leave" %}
+                                {{ attendance["attendance_status"] }} ({{ attendance["leave_type"] }})
+                            {% else %}
+                                {% if attendance["attendance_status"] == "Off" %}
+                                    {{ attendance["attendance_status"] }}
+                                {% else %}
+                                    {{ attendance["attendance_status"] }}
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% } %}
+        </tbody>
+    </table>
+{% } else { %}
+    <p style="margin-top: 30px;"> No Data. </p>
+{% } %}
