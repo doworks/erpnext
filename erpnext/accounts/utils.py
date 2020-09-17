@@ -122,7 +122,7 @@ def get_balance_on(account=None, date=None, party_type=None, party=None, company
 		cost_center = frappe.form_dict.get("cost_center")
 
 
-	cond = []
+	cond = ["is_cancelled=0"]
 	if date:
 		cond.append("posting_date <= %s" % frappe.db.escape(cstr(date)))
 	else:
@@ -200,14 +200,13 @@ def get_balance_on(account=None, date=None, party_type=None, party=None, company
 		bal = frappe.db.sql("""
 			SELECT {0}
 			FROM `tabGL Entry` gle
-			WHERE {1}
-			AND is_cancelled = 0""".format(select_field, " and ".join(cond)))[0][0]
+			WHERE {1}""".format(select_field, " and ".join(cond)))[0][0]
 
 		# if bal is None, return 0
 		return flt(bal)
 
 def get_count_on(account, fieldname, date):
-	cond = []
+	cond = ["is_cancelled=0"]
 	if date:
 		cond.append("posting_date <= %s" % frappe.db.escape(cstr(date)))
 	else:
