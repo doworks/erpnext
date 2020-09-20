@@ -138,7 +138,10 @@ def get_employee_shift_timings(employee, for_timestamp=now_datetime(), consider_
 	prev_shift = curr_shift = next_shift = None
 	curr_shift = get_employee_shift(employee, for_timestamp.date(), consider_default_shift, 'forward')
 	if curr_shift:
-		next_shift = get_employee_shift(employee, curr_shift.start_datetime.date()+timedelta(days=1), consider_default_shift, 'forward')
+		if curr_shift.shift_type.in_two_days and curr_shift.shift_type.calculate_attendance_date_as_per == "Check-out":
+			next_shift = get_employee_shift(employee, curr_shift.start_datetime.date()+timedelta(days=2), consider_default_shift, 'forward')
+		else:
+			next_shift = get_employee_shift(employee, curr_shift.start_datetime.date()+timedelta(days=1), consider_default_shift, 'forward')
 	prev_shift = get_employee_shift(employee, for_timestamp.date()+timedelta(days=-1), consider_default_shift, 'reverse')
 
 	if curr_shift:
@@ -166,9 +169,14 @@ def get_shift_details(shift_type_name, for_date=nowdate()):
 	if not shift_type_name:
 		return None
 	shift_type = frappe.get_doc('Shift Type', shift_type_name)
-	start_datetime = datetime.combine(for_date, datetime.min.time()) + shift_type.start_time
-	for_date = for_date + timedelta(days=1) if shift_type.start_time > shift_type.end_time else for_date
-	end_datetime = datetime.combine(for_date, datetime.min.time()) + shift_type.end_time
+	start_date = for_date
+	if shift_type.in_two_days:
+		start_date = for_date - timedelta(days=1) if shift_type.calculate_attendance_date_as_per == "Check-out" else for_date
+	start_datetime = datetime.combine(start_date, datetime.min.time()) + shift_type.start_time
+	end_date = for_date + timedelta(days=1) if shift_type.start_time > shift_type.end_time else for_date
+	if shift_type.in_two_days and shift_type.calculate_attendance_date_as_per == "Check-out":
+		end_date = for_date
+	end_datetime = datetime.combine(end_date, datetime.min.time()) + shift_type.end_time
 	actual_start = start_datetime - timedelta(minutes=shift_type.begin_check_in_before_shift_start_time)
 	actual_end = end_datetime + timedelta(minutes=shift_type.allow_check_out_after_shift_end_time)
 

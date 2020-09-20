@@ -104,6 +104,7 @@ def make_attendance_records(student, student_name, status, course_schedule=None,
 	student_attendance.date = date
 	student_attendance.status = status
 	student_attendance.save()
+	student_attendance.submit()
 
 
 @frappe.whitelist()
@@ -151,7 +152,7 @@ def get_fee_components(fee_structure):
 	:param fee_structure: Fee Structure.
 	"""
 	if fee_structure:
-		fs = frappe.get_list("Fee Component", fields=["fees_category", "amount"] , filters={"parent": fee_structure}, order_by= "idx")
+		fs = frappe.get_list("Fee Component", fields=["fees_category", "description", "amount"] , filters={"parent": fee_structure}, order_by= "idx")
 		return fs
 
 
@@ -363,9 +364,9 @@ def get_current_enrollment(student, academic_year=None):
 		select
 			name as program_enrollment, student_name, program, student_batch_name as student_batch,
 			student_category, academic_term, academic_year
-		from 
+		from
 			`tabProgram Enrollment`
-		where 
+		where
 			student = %s and academic_year = %s
 		order by creation''', (student, current_academic_year), as_dict=1)
 
@@ -373,3 +374,36 @@ def get_current_enrollment(student, academic_year=None):
 		return program_enrollment_list[0]
 	else:
 		return None
+
+@frappe.whitelist()
+def get_student_group(student):
+	current_academic_year = frappe.defaults.get_defaults().academic_year
+	group_list = frappe.db.sql('''
+		select
+			`tabStudent Group`.student_group_name
+		from 
+			`tabStudent Group Student`
+		left join
+			`tabStudent Group` on `tabStudent Group`.`name` = `tabStudent Group Student`.`parent`
+		where 
+			`tabStudent Group Student`.student = %s and `tabStudent Group`.academic_year = %s
+		''', (student, current_academic_year), as_dict=1)
+
+	group_list_name = []
+	for group in group_list:
+		group_list_name.append(group.student_group_name)
+	
+	if group_list_name:
+		return ", ".join(map(str, group_list_name))
+	else:
+		return None
+
+@frappe.whitelist()
+def get_student_fee_components(student_fee_structure):
+	"""Returns Student Fee Components.
+
+	:param student_fee_structure: Student Fee Structure.
+	"""
+	if student_fee_structure:
+		fs = frappe.get_list("Student Fee Component", fields=["student_category", "description", "is_transport", "fees_category", "amount"] , filters={"parent": student_fee_structure}, order_by= "idx")
+		return fs

@@ -72,7 +72,7 @@ def add_log_based_on_employee_field(employee_field_value, timestamp, device_id=N
 	return doc
 
 
-def mark_attendance_and_link_log(logs, attendance_status, attendance_date, working_hours=None, late_entry=False, early_exit=False, shift=None):
+def mark_attendance_and_link_log(logs, attendance_status, attendance_date, working_hours=None, late_entry=False, late_entry_time=None, early_exit=False, early_exit_time=None, in_time=None, out_time=None, shift=None, in_two_days=False, calculate_attendance_date_as_per=None):
 	"""Creates an attendance and links the attendance to the Employee Checkin.
 	Note: If attendance is already present for the given date, the logs are marked as skipped and no exception is thrown.
 
@@ -90,7 +90,12 @@ def mark_attendance_and_link_log(logs, attendance_status, attendance_date, worki
 		return None
 	elif attendance_status in ('Present', 'Absent', 'Half Day'):
 		employee_doc = frappe.get_doc('Employee', employee)
+		if in_two_days and calculate_attendance_date_as_per == 'Check-out':
+			attendance_date = frappe.utils.add_days(attendance_date, 1)
 		if not frappe.db.exists('Attendance', {'employee':employee, 'attendance_date':attendance_date, 'docstatus':('!=', '2')}):
+			logs_dict = []
+			for log in logs:
+				logs_dict.append({'time': log.time, 'log_type':log.log_type})
 			doc_dict = {
 				'doctype': 'Attendance',
 				'employee': employee,
@@ -100,7 +105,12 @@ def mark_attendance_and_link_log(logs, attendance_status, attendance_date, worki
 				'company': employee_doc.company,
 				'shift': shift,
 				'late_entry': late_entry,
-				'early_exit': early_exit
+				'late_entry_time': late_entry_time,
+				'early_exit': early_exit,
+				'early_exit_time': early_exit_time,
+				'in_time': in_time,
+				'out_time': out_time,
+				'logs': logs_dict
 			}
 			attendance = frappe.get_doc(doc_dict).insert()
 			attendance.submit()

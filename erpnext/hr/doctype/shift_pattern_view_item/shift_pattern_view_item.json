@@ -1,0 +1,39 @@
+{
+ "actions": [],
+ "creation": "2020-07-13 14:53:01.800437",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "shift_type"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "shift_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Shift Type",
+   "options": "Shift Type"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2020-08-19 10:42:12.701492",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Shift Pattern View Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

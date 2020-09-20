@@ -28,30 +28,34 @@ class ShiftType(Document):
 		logs = frappe.db.get_list('Employee Checkin', fields="*", filters=filters, order_by="employee,time")
 		for key, group in itertools.groupby(logs, key=lambda x: (x['employee'], x['shift_actual_start'])):
 			single_shift_logs = list(group)
-			attendance_status, working_hours, late_entry, early_exit = self.get_attendance(single_shift_logs)
-			mark_attendance_and_link_log(single_shift_logs, attendance_status, key[1].date(), working_hours, late_entry, early_exit, self.name)
+			attendance_status, working_hours, late_entry, late_entry_time, early_exit, early_exit_time, in_time, out_time = self.get_attendance(single_shift_logs)
+			mark_attendance_and_link_log(single_shift_logs, attendance_status, key[1].date(), working_hours, late_entry, late_entry_time, early_exit, early_exit_time, in_time, out_time, self.name, self.in_two_days, self.calculate_attendance_date_as_per)
 		for employee in self.get_assigned_employee(self.process_attendance_after, True):
 			self.mark_absent_for_dates_with_no_attendance(employee)
 
 	def get_attendance(self, logs):
-		"""Return attendance_status, working_hours for a set of logs belonging to a single shift.
+		"""Return attendance_status, working_hours, late_entry, early_exit, in_time, out_time
+		for a set of logs belonging to a single shift.
 		Assumtion:
 			1. These logs belongs to an single shift, single employee and is not in a holiday date.
 			2. Logs are in chronological order
 		"""
 		late_entry = early_exit = False
+		late_entry_time = early_exit_time = 0
 		total_working_hours, in_time, out_time = calculate_working_hours(logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on)
 		if cint(self.enable_entry_grace_period) and in_time and in_time > logs[0].shift_start + timedelta(minutes=cint(self.late_entry_grace_period)):
 			late_entry = True
+			late_entry_time = in_time - logs[0].shift_start
 
 		if cint(self.enable_exit_grace_period) and out_time and out_time < logs[0].shift_end - timedelta(minutes=cint(self.early_exit_grace_period)):
 			early_exit = True
+			early_exit_time = logs[0].shift_end - out_time
 
 		if self.working_hours_threshold_for_absent and total_working_hours < self.working_hours_threshold_for_absent:
-			return 'Absent', total_working_hours, late_entry, early_exit
+			return 'Absent', total_working_hours, late_entry, late_entry_time, early_exit, early_exit_time, in_time, out_time
 		if self.working_hours_threshold_for_half_day and total_working_hours < self.working_hours_threshold_for_half_day:
-			return 'Half Day', total_working_hours, late_entry, early_exit
-		return 'Present', total_working_hours, late_entry, early_exit
+			return 'Half Day', total_working_hours, late_entry, late_entry_time, early_exit, early_exit_time, in_time, out_time
+		return 'Present', total_working_hours, late_entry, late_entry_time, early_exit, early_exit_time, in_time, out_time
 
 	def mark_absent_for_dates_with_no_attendance(self, employee):
 		"""Marks Absents for the given employee on working days in this shift which have no attendance marked.
