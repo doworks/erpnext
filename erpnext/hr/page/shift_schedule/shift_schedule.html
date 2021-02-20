@@ -1,0 +1,104 @@
+{% if data %}
+<style>
+.table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td, .table-bordered > tfoot > tr > td {
+	border: 1px solid #979ea2;
+	text-align: center;
+}
+
+.table-bordered {
+    border: 1px solid #979ea2;
+}
+
+.table th.header{
+    font-weight: bold;
+    font-size: 18px;
+    padding: 0px;
+    text-align: left;
+    background: lightgrey;
+    padding-left: 5px;
+    border: 1px solid #969ea2;
+}
+
+.table td.fill{
+    background: lightgreen;
+    /*border-right: 1px solid lightgreen;
+    border-left: 1px solid lightgreen;
+    color: #fff;*/
+    font-weight: bold;
+}
+
+a.clone i{
+    color: coral;
+}
+
+</style>
+
+{% for date in data %}
+    <table class="table table-bordered small">
+        <thead>
+            <tr>
+                <th colspan="27" class="header">{{ __(date.date_display) }}</th>
+            </tr>
+            <tr style="background: antiquewhite; font-size: 12px;">
+                <th>{{ __("Employee") }}</th>
+                <th>{{ __("Designation") }}</th>
+                <th>{{ __("Shift") }}</th>
+                {% for hour in hours %}
+                    <th>{{ __(hour) }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in date.records %}
+                <tr>
+                    <td>{{ record.emp_name }} {% if record.shift_name %}<a class="clone" data-emp="{{ record.emp_doc_name }}" data-emp-name="{{ record.emp_name }}" data-date="{{ record.date }}" data-shift="{{ record.shift_name }}"><i class="fa fa-clone"></i></a>{% endif %}</td>
+                    <td>{{ record.designation }}</td> 
+                    {% if record.shift_name %}
+                        <td style="padding: 0;"><a class="btn btn-primary btn-block btn-reschedule" style="border-radius: 0" data-shift-assignment="{{ record.shift_assignment_name }}">{{ record.shift_name }}</a></td>
+                    {% else %}
+                        {% if record.status == "on_leave" %}
+                            <td style="padding: 0;"><a class="btn btn-warning btn-block" data-emp="{{ record.emp_doc_name }}" data-emp-name="{{ record.emp_name }}" data-date="{{ record.date }}" style="border-radius: 0">{{ __("On Leave") }}</a></td>
+                        {% else %}
+                            {% if record.status == "holiday" %}
+                                <td style="padding: 0;"><a class="btn btn-danger btn-block" data-emp="{{ record.emp_doc_name }}" data-emp-name="{{ record.emp_name }}" data-date="{{ record.date }}" style="border-radius: 0">{{ __("Holiday") }}</a></td>
+                            {% else %}
+                                <td style="padding: 0;"><a class="btn btn-default btn-block btn-schedule" data-emp="{{ record.emp_doc_name }}" data-emp-name="{{ record.emp_name }}" data-date="{{ record.date }}" style="border-radius: 0">{{ __("Assign Shift") }}</a></td>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                    {% if record.status == "exist" %}
+                        {% for hour in int_hours %}
+                            {% var exist = false %}
+                            {% for filled_hour in record.filled_hours %}
+                                {% if parseInt(filled_hour.hour) == parseInt(hour) %}
+                                    {% exist = true %}
+                                    <td class="fill">
+                                        {% if filled_hour.is_edge %}
+                                            {{ filled_hour.hour }}
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+                            {% if not exist %}
+                                <td></td>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        {% if record.status == "on_leave" %}
+                            <td colspan="24">{{ record.leave_type }}</td>
+                        {% else %}
+                            {% if record.status == "holiday" %}
+                                <td colspan="24">{{ record.holiday_name }}</td>
+                            {% else %}
+                                <td colspan="24"></td>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endfor %}
+{% } else { %}
+    <p style="margin-top: 30px;"> No Records. </p>
+{% } %}

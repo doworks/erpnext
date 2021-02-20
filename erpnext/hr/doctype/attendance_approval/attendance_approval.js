@@ -216,12 +216,12 @@ function format_data(att, employee_name) {
 			result += ` - <span style="color:yellow"><b><u>OT:</u></b> ${parseFloat(overtime).toFixed(2)}</span>`;
 		}
 
-		if (att.late_entry_time) {
+		if (att.late_entry_time && att.late_entry) {
 			result += `<br><b>LE:</b> ${att.late_entry_time}`;
 		}
 
-		if (att.early_exit_time) {
-			result += `${(att.late_entry_time ? ' - ' : '<br>')}<b>EE:</b> ${att.early_exit_time}`;
+		if (att.early_exit_time && att.early_exit) {
+			result += `${(att.late_entry ? ' - ' : '<br>')}<b>EE:</b> ${att.early_exit_time}`;
 		}
 	} else if (att.attendance_status == "Absent") {
 		result += `<div class="att-cell" data-emp="${employee_name}" data-date="${att.attendance_date}"><b>(${att.shift_abbreviation})</b> ${(att.has_checkins_outside_duty ? `<i style="color:#${(att.record_status == 'Unresolved' ? `920808` : `ffffff`)};" class="fa fa-exclamation-circle"></i>` : '')}`;
@@ -480,7 +480,6 @@ $(document).on('dblclick', '.att-cell', function () {
 			var new_change_log = [];
 
 			if (attendance_status != selected_att.attendance_status) {
-				attendance_data[employee][att_date]['attendance_status'] = attendance_status;
 				new_change_log.push({
 					'time': frappe.datetime.now_datetime(),
 					'user': frappe.session.user,
@@ -488,10 +487,10 @@ $(document).on('dblclick', '.att-cell', function () {
 					'from': selected_att.attendance_status,
 					'to': attendance_status
 				});
+				attendance_data[employee][att_date]['attendance_status'] = attendance_status;
 			}
 
 			if (record_status != selected_att.record_status) {
-				attendance_data[employee][att_date]['record_status'] = record_status;
 				new_change_log.push({
 					'time': frappe.datetime.now_datetime(),
 					'user': frappe.session.user,
@@ -499,6 +498,7 @@ $(document).on('dblclick', '.att-cell', function () {
 					'from': selected_att.record_status,
 					'to': record_status
 				});
+				attendance_data[employee][att_date]['record_status'] = record_status;
 			}
 
 			if (!working_hours)

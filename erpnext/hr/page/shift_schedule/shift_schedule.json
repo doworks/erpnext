@@ -1,0 +1,19 @@
+{
+ "content": null,
+ "creation": "2020-09-19 12:16:58.346602",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2020-09-19 12:16:58.346602",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "shift-schedule",
+ "owner": "Administrator",
+ "page_name": "shift-schedule",
+ "roles": [],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Shift Schedule"
+}

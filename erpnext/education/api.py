@@ -368,6 +368,7 @@ def get_current_enrollment(student, academic_year=None):
 			`tabProgram Enrollment`
 		where
 			student = %s and academic_year = %s
+			AND docstatus = 1
 		order by creation''', (student, current_academic_year), as_dict=1)
 
 	if program_enrollment_list:

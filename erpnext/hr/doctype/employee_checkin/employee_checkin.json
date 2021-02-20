@@ -26,7 +26,8 @@
    "fieldtype": "Link",
    "label": "Employee",
    "options": "Employee",
-   "reqd": 1
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fetch_from": "employee.employee_name",
@@ -61,7 +62,8 @@
    "in_list_view": 1,
    "label": "Time",
    "permlevel": 1,
-   "reqd": 1
+   "reqd": 1,
+   "search_index": 1
   },
   {
    "fieldname": "device_id",
@@ -107,7 +109,7 @@
   }
  ],
  "links": [],
- "modified": "2020-07-08 11:02:32.660986",
+ "modified": "2020-12-08 13:13:21.046967",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Checkin",

@@ -31,6 +31,12 @@
   "early_exit_time",
   "section_break_23",
   "logs",
+  "overtime_section",
+  "overtime_125",
+  "column_break_27",
+  "overtime_150",
+  "column_break_29",
+  "overtime_200",
   "amended_from"
  ],
  "fields": [
@@ -228,13 +234,41 @@
    "label": "Logs",
    "options": "Checkin Log Item",
    "read_only": 1
+  },
+  {
+   "fieldname": "overtime_section",
+   "fieldtype": "Section Break",
+   "label": "Overtime"
+  },
+  {
+   "fieldname": "column_break_27",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_29",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "overtime_125",
+   "fieldtype": "Float",
+   "label": "Overtime 125% (Hours)"
+  },
+  {
+   "fieldname": "overtime_150",
+   "fieldtype": "Float",
+   "label": "Overtime 150% (Hours)"
+  },
+  {
+   "fieldname": "overtime_200",
+   "fieldtype": "Float",
+   "label": "Overtime 200% (Hours)"
   }
  ],
  "icon": "fa fa-ok",
  "idx": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-07-16 08:56:54.045289",
+ "modified": "2020-10-11 11:36:39.325758",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance",

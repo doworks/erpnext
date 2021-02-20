@@ -6,8 +6,12 @@ frappe.views.calendar["Shift Assignment"] = {
 		"start": "date",
 		"end": "date",
 		"id": "name",
+		"title": "employee",
+		"allDay": "allDay",
+		"progress": "progress",
 		"docstatus": 1
 	},
+	gantt: true,
 	options: {
 		header: {
 			left: 'prev,next today',
