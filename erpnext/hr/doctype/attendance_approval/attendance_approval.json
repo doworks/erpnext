@@ -14,6 +14,7 @@
   "section_break_6",
   "attendance_display",
   "attendance_data",
+  "attendance_created",
   "amended_from"
  ],
  "fields": [
@@ -70,12 +71,20 @@
    "fieldtype": "Code",
    "hidden": 1,
    "label": "Attendance Data"
+  },
+  {
+   "default": "0",
+   "fieldname": "attendance_created",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Attendance Created",
+   "read_only": 1
   }
  ],
  "hide_toolbar": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2020-08-12 18:07:59.856059",
+ "modified": "2020-12-12 08:58:12.338235",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Attendance Approval",

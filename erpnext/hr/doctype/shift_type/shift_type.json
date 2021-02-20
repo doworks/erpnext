@@ -15,9 +15,12 @@
   "end_time",
   "in_two_days",
   "calculate_attendance_date_as_per",
+  "split_shift",
   "column_break_3",
   "holiday_list",
   "enable_auto_attendance",
+  "split_shifts_section",
+  "split_shifts",
   "auto_attendance_settings_section",
   "determine_check_in_and_check_out",
   "working_hours_calculation_based_on",
@@ -33,7 +36,20 @@
   "late_entry_grace_period",
   "column_break_18",
   "enable_exit_grace_period",
-  "early_exit_grace_period"
+  "early_exit_grace_period",
+  "late_overtime_section_break",
+  "late_component",
+  "late_calculation_formula",
+  "overtime_125_component",
+  "overtime_125_formula",
+  "overtime_150_component",
+  "overtime_150_formula",
+  "overtime_200_component",
+  "overtime_200_formula",
+  "shift_allowance_section",
+  "has_shift_allowance",
+  "shift_allowance_component",
+  "shift_allowance_formula"
  ],
  "fields": [
   {
@@ -186,11 +202,10 @@
    "fieldtype": "Column Break"
   },
   {
-   "depends_on": "eval:doc.is_flexible===1",
    "fieldname": "working_hours",
    "fieldtype": "Float",
    "label": "Working Hours",
-   "mandatory_depends_on": "eval:doc.is_flexible===1",
+   "mandatory_depends_on": "eval:doc.is_flexible===1 || doc.split_shift===1",
    "precision": "2"
   },
   {
@@ -205,10 +220,102 @@
    "fieldtype": "Select",
    "label": "Calculate Attendance Date As Per",
    "options": "Check-in\nCheck-out"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "late_overtime_section_break",
+   "fieldtype": "Section Break",
+   "label": "Late & Overtime Calculation"
+  },
+  {
+   "fieldname": "late_calculation_formula",
+   "fieldtype": "Code",
+   "label": "Late Calculation Formula (Per Minute)"
+  },
+  {
+   "fieldname": "overtime_125_formula",
+   "fieldtype": "Code",
+   "label": "Overtime 125% Formula (Per Hour)"
+  },
+  {
+   "fieldname": "overtime_150_formula",
+   "fieldtype": "Code",
+   "label": "Overtime 150% Formula (Per Hour)"
+  },
+  {
+   "fieldname": "overtime_200_formula",
+   "fieldtype": "Code",
+   "label": "Overtime 200% Formula (Per Hour)"
+  },
+  {
+   "fieldname": "late_component",
+   "fieldtype": "Link",
+   "label": "Late Component",
+   "options": "Salary Component"
+  },
+  {
+   "fieldname": "overtime_125_component",
+   "fieldtype": "Link",
+   "label": "Overtime 125% Component",
+   "options": "Salary Component"
+  },
+  {
+   "fieldname": "overtime_150_component",
+   "fieldtype": "Link",
+   "label": "Overtime 150% Component",
+   "options": "Salary Component"
+  },
+  {
+   "fieldname": "overtime_200_component",
+   "fieldtype": "Link",
+   "label": "Overtime 200% Component",
+   "options": "Salary Component"
+  },
+  {
+   "fieldname": "shift_allowance_section",
+   "fieldtype": "Section Break",
+   "label": "Shift Allowance"
+  },
+  {
+   "default": "0",
+   "fieldname": "has_shift_allowance",
+   "fieldtype": "Check",
+   "label": "Has Shift Allowance"
+  },
+  {
+   "depends_on": "eval:doc.has_shift_allowance",
+   "fieldname": "shift_allowance_formula",
+   "fieldtype": "Code",
+   "label": "Shift Allowance Formula (Per Shift)"
+  },
+  {
+   "depends_on": "eval:doc.has_shift_allowance",
+   "fieldname": "shift_allowance_component",
+   "fieldtype": "Link",
+   "label": "Shift Allowance Component",
+   "options": "Salary Component"
+  },
+  {
+   "default": "0",
+   "fieldname": "split_shift",
+   "fieldtype": "Check",
+   "label": "Split Shift"
+  },
+  {
+   "depends_on": "eval:doc.split_shift == 1",
+   "fieldname": "split_shifts_section",
+   "fieldtype": "Section Break",
+   "label": "Split Shifts"
+  },
+  {
+   "fieldname": "split_shifts",
+   "fieldtype": "Table",
+   "label": "Split Shifts",
+   "options": "Split Shift Item"
   }
  ],
  "links": [],
- "modified": "2020-07-16 07:29:47.833457",
+ "modified": "2020-10-25 07:57:03.614454",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Shift Type",

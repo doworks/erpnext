@@ -454,13 +454,24 @@ class SalarySlip(TransactionBase):
 			doc.append('earnings', wages_row)
 
 	def calculate_net_pay(self):
+		payroll = None
+		if self.payroll_entry:
+			payroll = frappe.get_doc('Payroll Entry', self.payroll_entry)
+
 		if self.salary_structure_assignment:
 			self.calculate_component_amounts("earnings")
+			if payroll:
+				if payroll.validate_attendance:
+					self.calculate_attendance_amounts("earnings")
 		self.gross_pay = self.get_component_totals("earnings", depends_on_payment_days=1)
 		self.base_gross_pay = flt(flt(self.gross_pay) * flt(self.exchange_rate), self.precision('base_gross_pay'))
 
 		if self.salary_structure_assignment:
 			self.calculate_component_amounts("deductions")
+			if payroll:
+				if payroll.validate_attendance:
+					self.calculate_attendance_amounts("deductions")
+		self.total_deduction = self.get_component_totals("deductions")
 
 		self.set_loan_repayment()
 		self.set_component_amounts_based_on_payment_days()
@@ -470,6 +481,16 @@ class SalarySlip(TransactionBase):
 		self.total_deduction = self.get_component_totals("deductions")
 		self.base_total_deduction = flt(flt(self.total_deduction) * flt(self.exchange_rate), self.precision('base_total_deduction'))
 		self.net_pay = flt(self.gross_pay) - (flt(self.total_deduction) + flt(self.total_loan_repayment))
+
+		if payroll:
+			if payroll.validate_attendance:
+				self.calculate_leave_amount()
+				self.calculate_absent_amount()
+
+		self.gross_pay = self.get_component_totals("earnings")
+		self.total_deduction = self.get_component_totals("deductions")
+		self.net_pay = flt(self.gross_pay) - (flt(self.total_deduction) + flt(self.total_loan_repayment))
+
 		self.rounded_total = rounded(self.net_pay)
 		self.base_net_pay = flt(flt(self.net_pay) * flt(self.exchange_rate), self.precision('base_net_pay'))
 		self.base_rounded_total = flt(rounded(self.base_net_pay), self.precision('base_net_pay'))
@@ -489,6 +510,216 @@ class SalarySlip(TransactionBase):
 			self.add_employee_benefits(payroll_period)
 		else:
 			self.add_tax_components(payroll_period)
+
+
+	def calculate_attendance_amounts(self, component_type):
+		general_shift_settings = frappe.get_single('General Shift Settings')
+		
+		if component_type == 'earnings':
+			employee_attendance = frappe.get_all(
+				'Attendance', 
+				fields='*', 
+				filters={
+					'attendance_date': ('>=', self.start_date),
+					'attendance_date': ('<=', self.end_date),
+					'employee': self.employee,
+					'docstatus': 1,
+					'status': ('in', ['Present'])
+				}
+			)
+
+			overtime_125_hours = 0
+			overtime_125_amount = 0
+			overtime_150_hours = 0
+			overtime_150_amount = 0
+			overtime_200_hours = 0
+			overtime_200_amount = 0
+			has_shift_allowance = False
+			shift_allowance_amount = 0
+
+			if not self.get("_data"):
+				self._data = self.get_data_for_eval()
+
+			components = frappe._dict()
+
+			for att in employee_attendance:
+				shift_type = frappe.get_doc('Shift Type', att.shift)
+				overtime_125_formula = shift_type.overtime_125_formula if shift_type.overtime_125_formula else general_shift_settings.overtime_125_formula
+				overtime_125_component = shift_type.overtime_125_component if shift_type.overtime_125_component else general_shift_settings.overtime_125_component
+				struct_row_125 = frappe.get_doc('Salary Component', overtime_125_component)
+				struct_row_125.set('amount_based_on_formula', 1)
+				struct_row_125.set('formula', overtime_125_formula)
+				struct_row_125.set('abbr', struct_row_125.salary_component_abbr)
+				amount = self.eval_condition_and_formula(struct_row_125, self._data) * att.overtime_125
+				components.setdefault(struct_row_125.name, []).append({
+					'struct_row': struct_row_125,
+					'amount': amount,
+					'quantity': att.overtime_125,
+					'component_type': component_type
+				})
+
+				overtime_150_formula = shift_type.overtime_150_formula if shift_type.overtime_150_formula else general_shift_settings.overtime_150_formula
+				overtime_150_component = shift_type.overtime_150_component if shift_type.overtime_150_component else general_shift_settings.overtime_150_component
+				struct_row_150 = frappe.get_doc('Salary Component', overtime_150_component)
+				struct_row_150.set('amount_based_on_formula', 1)
+				struct_row_150.set('formula', overtime_150_formula)
+				struct_row_150.set('abbr', struct_row_150.salary_component_abbr)
+				amount = self.eval_condition_and_formula(struct_row_150, self._data) * att.overtime_150
+				components.setdefault(struct_row_150.name, []).append({
+					'struct_row': struct_row_150,
+					'amount': amount,
+					'quantity': att.overtime_150,
+					'component_type': component_type
+				})
+				
+				overtime_200_formula = shift_type.overtime_200_formula if shift_type.overtime_200_formula else general_shift_settings.overtime_200_formula
+				overtime_200_component = shift_type.overtime_200_component if shift_type.overtime_200_component else general_shift_settings.overtime_200_component
+				struct_row_200 = frappe.get_doc('Salary Component', overtime_200_component)
+				struct_row_200.set('amount_based_on_formula', 1)
+				struct_row_200.set('formula', overtime_200_formula)
+				struct_row_200.set('abbr', struct_row_200.salary_component_abbr)
+				amount = self.eval_condition_and_formula(struct_row_200, self._data) * att.overtime_200
+				components.setdefault(struct_row_200.name, []).append({
+					'struct_row': struct_row_200,
+					'amount': amount,
+					'quantity': att.overtime_200,
+					'component_type': component_type
+				})
+				
+				if shift_type.has_shift_allowance:
+					shift_allowance_formula = shift_type.shift_allowance_formula if shift_type.shift_allowance_formula else general_shift_settings.shift_allowance_formula
+					shift_allowance_component = shift_type.shift_allowance_component if shift_type.shift_allowance_component else general_shift_settings.shift_allowance_component
+					struct_row_allowance = frappe.get_doc('Salary Component', shift_allowance_component)
+					struct_row_allowance.set('amount_based_on_formula', 1)
+					struct_row_allowance.set('formula', shift_allowance_formula)
+					struct_row_allowance.set('abbr', struct_row_allowance.salary_component_abbr)
+					amount = self.eval_condition_and_formula(struct_row_allowance, self._data)
+					components.setdefault(struct_row_allowance.name, []).append({
+						'struct_row': struct_row_allowance,
+						'amount': amount,
+						'quantity': 1,
+						'component_type': component_type
+					})
+
+			for component, component_list in components.items():
+				total_amount = total_quantity = 0
+				for item in component_list:
+					total_amount += flt(item['amount'])
+					total_quantity += flt(item['quantity'])
+				
+				if total_amount > 0:
+					self.update_component_row(component_list[0]['struct_row'], total_amount, component_type, quantity=total_quantity)
+		elif component_type == 'deductions':
+			employee_attendance = frappe.get_all(
+				'Attendance', 
+				fields='*', 
+				filters={
+					'attendance_date': ('>=', self.start_date),
+					'attendance_date': ('<=', self.end_date),
+					'employee': self.employee,
+					'docstatus': 1,
+					'status': 'Present'
+				}
+			)
+
+			late_hours = 0
+			late_amount = 0
+
+			if not self.get("_data"):
+				self._data = self.get_data_for_eval()
+
+			components = frappe._dict()
+
+			for att in employee_attendance:
+				shift_type = frappe.get_doc('Shift Type', att.shift)
+				late_calculation_formula = shift_type.late_calculation_formula if shift_type.late_calculation_formula else general_shift_settings.late_calculation_formula
+				late_component = shift_type.late_component if shift_type.late_component else general_shift_settings.late_component
+				struct_row_late = frappe.get_doc('Salary Component', late_component)
+				struct_row_late.set('amount_based_on_formula', 1)
+				struct_row_late.set('formula', late_calculation_formula)
+				struct_row_late.set('abbr', struct_row_late.salary_component_abbr)
+				amount = self.eval_condition_and_formula(struct_row_late, self._data) * (flt(att.late_entry_time) + flt(att.early_exit_time))
+				components.setdefault(struct_row_late.name, []).append({
+					'struct_row': struct_row_late,
+					'amount': amount,
+					'quantity': (flt(att.late_entry_time) + flt(att.early_exit_time)),
+					'component_type': component_type
+				})
+
+			for component, component_list in components.items():
+				total_amount = total_quantity = 0
+				for item in component_list:
+					total_amount += flt(item['amount'])
+					total_quantity += flt(item['quantity'])
+				
+				if total_amount > 0:
+					self.update_component_row(component_list[0]['struct_row'], total_amount, component_type, quantity=total_quantity)
+
+	def calculate_leave_amount(self):
+		component_type = 'earnings'
+		leaves = frappe.db.sql("""SELECT leave_type, count(*) as leave_days
+			FROM `tabAttendance`
+			WHERE attendance_date >= %s
+			AND attendance_date <= %s
+			AND employee = %s
+			AND docstatus = 1
+			AND `status` = 'On Leave'
+			GROUP BY leave_type
+		""", (self.start_date, self.end_date, self.employee), as_dict=1)
+
+		if not self.get("_data"):
+			self._data = self.get_data_for_eval()
+
+		for leave in leaves:
+			salary_detail = frappe.db.sql("""SELECT *
+				FROM `tabSalary Detail`
+				WHERE parent = %s
+				AND leave_type = %s
+			""", (self.salary_structure_assignment, leave.leave_type), as_dict=1)
+			
+			leave_component = frappe._dict()
+			leave_doc = frappe._dict()
+			if not salary_detail:
+				leave_component = frappe.get_all('Salary Component', fields='name', filters={'leave_type': leave.leave_type})
+				if leave_component:
+					leave_doc = frappe.get_doc('Salary Component', leave_component[0].name)
+					leave_doc.set('abbr', leave_doc.salary_component_abbr)
+			else:
+				leave_doc = frappe.get_doc('Salary Component', salary_detail[0].salary_component)
+				if leave_doc:
+					leave_doc.set('amount_based_on_formula', salary_detail[0].amount_based_on_formula)
+					leave_doc.set('formula', salary_detail[0].formula)
+					leave_doc.set('amount', salary_detail[0].amount)
+
+			if leave_doc:
+				amount = self.eval_condition_and_formula(leave_doc, self._data) * flt(leave.leave_days)
+				self.update_component_row(leave_doc, amount, component_type, quantity=leave.leave_days)
+
+	def calculate_absent_amount(self):
+		component_type = 'deductions'
+		if self.absent_days:
+			salary_detail = frappe.db.sql("""SELECT *
+				FROM `tabSalary Detail`
+				WHERE parent = %s
+				AND salary_component = 'Absent'
+			""", (self.salary_structure_assignment), as_dict=1)
+			
+			absent_component = frappe._dict()
+			absent_doc = frappe._dict()
+			if not salary_detail:
+				absent_doc = frappe.get_doc('Salary Component', 'Absent')
+				if absent_doc:
+					absent_doc.set('abbr', absent_doc.salary_component_abbr)
+			else:
+				absent_doc = frappe.get_doc('Salary Component', salary_detail[0].salary_component)
+				if absent_doc:
+					absent_doc.set('amount_based_on_formula', salary_detail[0].amount_based_on_formula)
+					absent_doc.set('formula', salary_detail[0].formula)
+					absent_doc.set('amount', salary_detail[0].amount)
+
+			if absent_doc:
+				amount = self.eval_condition_and_formula(absent_doc, self._data) * flt(self.absent_days)
+				self.update_component_row(absent_doc, amount, component_type, quantity=self.absent_days)
 
 	def add_structure_components(self, component_type):
 		if not self.get("_data"):
@@ -869,9 +1100,9 @@ class SalarySlip(TransactionBase):
 				getdate(self.start_date) < joining_date or
 				(relieving_date and getdate(self.end_date) > relieving_date)
 			)):
-			additional_amount = flt((flt(row.additional_amount) * flt(self.payment_days)
+			additional_amount = flt((flt(row.additional_amount) * (flt(self.payment_days) + flt(self.absent_days))
 				/ cint(self.total_working_days)), row.precision("additional_amount"))
-			amount = flt((flt(row.default_amount) * flt(self.payment_days)
+			amount = flt((flt(row.default_amount) * (flt(self.payment_days) + flt(self.absent_days))
 				/ cint(self.total_working_days)), row.precision("amount")) + additional_amount
 
 		elif not self.payment_days and not self.salary_slip_based_on_timesheet and cint(row.depends_on_payment_days):

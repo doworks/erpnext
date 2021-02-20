@@ -44,11 +44,15 @@ class ShiftType(Document):
 		late_entry = early_exit = False
 		late_entry_time = early_exit_time = 0
 		total_working_hours, in_time, out_time = calculate_working_hours(logs, self.determine_check_in_and_check_out, self.working_hours_calculation_based_on)
-		if cint(self.enable_entry_grace_period) and in_time and in_time > logs[0].shift_start + timedelta(minutes=cint(self.late_entry_grace_period)):
+		shift_start = logs[0].shift_start if logs else self.shift_start
+		if (cint(self.enable_entry_grace_period) and in_time and in_time > shift_start + timedelta(minutes=cint(self.late_entry_grace_period))) \
+			or (not cint(self.enable_entry_grace_period) and in_time and in_time > shift_start):
 			late_entry = True
-			late_entry_time = in_time - logs[0].shift_start
+			late_entry_time = in_time - shift_start
 
-		if cint(self.enable_exit_grace_period) and out_time and out_time < logs[0].shift_end - timedelta(minutes=cint(self.early_exit_grace_period)):
+		shift_end = logs[0].shift_end if logs else self.shift_end
+		if (cint(self.enable_exit_grace_period) and out_time and out_time < logs[0].shift_end - timedelta(minutes=cint(self.early_exit_grace_period))) \
+			or (not cint(self.enable_exit_grace_period) and out_time and out_time < logs[0].shift_end):
 			early_exit = True
 			early_exit_time = logs[0].shift_end - out_time
 
