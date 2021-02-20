@@ -407,9 +407,6 @@ frappe.ui.form.on('Salary Structure Assignment', {
 		frm.set_query("employee", function() {
 			return {
 				query: "erpnext.controllers.queries.employee_query",
-				filters: {
-					company: frm.doc.company
-				}
 			}
 		});
 		frm.set_query("salary_structure", function() {
@@ -427,7 +424,20 @@ frappe.ui.form.on('Salary Structure Assignment', {
 				filters: {
 					company: frm.doc.company,
 					docstatus: 1,
-					disabled: 0
+					disabled: 0,
+					currency: frm.doc.currency
+				}
+			};
+		});
+
+		frm.set_query("payroll_payable_account", function() {
+			var company_currency = erpnext.get_currency(frm.doc.company);
+			return {
+				filters: {
+					"company": frm.doc.company,
+					"root_type": "Liability",
+					"is_group": 0,
+					"account_currency": ["in", [frm.doc.currency, company_currency]],
 				}
 			}
 		});
@@ -467,6 +477,7 @@ frappe.ui.form.on('Salary Structure Assignment', {
 			frappe.meta.get_docfield("Salary Detail", field, frm.doc.name).read_only = 1;
 		});
 	},
+
 	employee: function(frm) {
 		if(frm.doc.employee){
 			frappe.call({

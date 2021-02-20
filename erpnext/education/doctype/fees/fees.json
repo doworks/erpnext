@@ -160,7 +160,8 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Program",
-   "options": "Program"
+   "options": "Program",
+   "reqd": 1
   },
   {
    "fieldname": "student_batch",
@@ -339,7 +340,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2020-09-17 01:47:50.108991",
+ "modified": "2020-08-05 14:05:47.728409",
  "modified_by": "Administrator",
  "module": "Education",
  "name": "Fees",
