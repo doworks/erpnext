@@ -205,6 +205,11 @@
    "read_only": 1
   },
   {
+   "fieldname": "quantity",
+   "fieldtype": "Float",
+   "label": "Quantity"
+  },
+  {
    "collapsible": 1,
    "fieldname": "section_break_5",
    "fieldtype": "Section Break",
