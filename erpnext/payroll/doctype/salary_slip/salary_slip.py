@@ -148,7 +148,7 @@ class SalarySlip(TransactionBase):
 				self._salary_structure_doc = frappe.get_doc('Salary Structure', self._salary_structure_assignment_doc.salary_structure)
 				self.salary_slip_based_on_timesheet = frappe.get_value("Salary Structure", self._salary_structure_assignment_doc.salary_structure, "salary_slip_based_on_timesheet") or 0
 				self.set_time_sheet()
-				self.pull_sal_struct()
+				self.pull_sal_structure_assignment()
 				ps = frappe.db.get_value("Payroll Settings", None, ["payroll_based_on","consider_unmarked_attendance_as"], as_dict=1)
 				return [ps.payroll_based_on, ps.consider_unmarked_attendance_as]
 
@@ -456,6 +456,10 @@ class SalarySlip(TransactionBase):
 		self.base_total_deduction = flt(flt(self.total_deduction) * flt(self.exchange_rate), self.precision('base_total_deduction'))
 		self.net_pay = flt(self.gross_pay) - (flt(self.total_deduction) + flt(self.total_loan_repayment))
 
+		payroll = None
+		if self.payroll_entry:
+			payroll = frappe.get_doc('Payroll Entry', self.payroll_entry)
+
 		if payroll:
 			if payroll.validate_attendance:
 				self.calculate_leave_amount()
@@ -485,7 +489,7 @@ class SalarySlip(TransactionBase):
 		else:
 			self.add_tax_components(payroll_period)
 
-		self.set_component_amounts_based_on_payment_days(component_type)
+		self.set_component_amounts_based_on_payment_days()
 
 	def calculate_attendance_amounts(self, component_type):
 		general_shift_settings = frappe.get_single('General Shift Settings')
