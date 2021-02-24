@@ -482,6 +482,10 @@ class SalarySlip(TransactionBase):
 		self.base_total_deduction = flt(flt(self.total_deduction) * flt(self.exchange_rate), self.precision('base_total_deduction'))
 		self.net_pay = flt(self.gross_pay) - (flt(self.total_deduction) + flt(self.total_loan_repayment))
 
+		payroll = None
+		if self.payroll_entry:
+			payroll = frappe.get_doc('Payroll Entry', self.payroll_entry)
+
 		if payroll:
 			if payroll.validate_attendance:
 				self.calculate_leave_amount()
