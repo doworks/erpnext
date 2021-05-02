@@ -200,9 +200,14 @@ class POSInvoice(SalesInvoice):
 
 	def validate_non_stock_items(self):
 		for d in self.get("items"):
-			is_stock_item = frappe.get_cached_value("Item", d.get("item_code"), "is_stock_item")
-			if not is_stock_item:
-				frappe.throw(_("Row #{}: Item {} is a non stock item. You can only include stock items in a POS Invoice. ").format(
+			#is_stock_item = frappe.get_cached_value("Item", d.get("item_code"), "is_stock_item")
+			#if not is_stock_item:
+			#	frappe.throw(_("Row #{}: Item {} is a non stock item. You can only include stock items in a POS Invoice. ").format(
+			#		d.idx, frappe.bold(d.item_code)
+			#	), title=_("Invalid Item"))
+			is_sales_item = frappe.get_cached_value("Item", d.get("item_code"), "is_sales_item")
+			if not is_sales_item:
+				frappe.throw(_("Row #{}: Item {} is a non sales item. You can only include sales items in a POS Invoice. ").format(
 					d.idx, frappe.bold(d.item_code)
 				), title=_("Invalid Item"))
 
