@@ -613,5 +613,5 @@ var calculate_totals = function (frm) {
 			frm.refresh_fields();
 		}
     });
-}*/
+}
 }*/

@@ -17,6 +17,7 @@
   "end_date",
   "shift_request",
   "department",
+  "notes",
   "amended_from"
  ],
  "fields": [
@@ -43,6 +44,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "shift_type",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -88,9 +90,7 @@
    "allow_on_submit": 1,
    "fieldname": "end_date",
    "fieldtype": "Date",
-   "label": "End Date",
-   "show_days": 1,
-   "show_seconds": 1
+   "label": "End Date"
   },
   {
    "allow_on_submit": 1,
@@ -98,14 +98,18 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Active\nInactive",
-   "show_days": 1,
-   "show_seconds": 1
+   "options": "Active\nInactive"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2020-06-15 14:27:54.310773",
+ "modified": "2021-04-08 10:44:12.902142",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Shift Assignment",

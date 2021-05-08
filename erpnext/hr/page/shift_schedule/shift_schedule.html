@@ -3,6 +3,9 @@
 .table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td, .table-bordered > tfoot > tr > td {
 	border: 1px solid #979ea2;
 	text-align: center;
+    padding: 3px;
+    font-size: 12px;
+    vertical-align: middle;
 }
 
 .table-bordered {
@@ -51,18 +54,18 @@ a.clone i{
         <tbody>
             {% for record in date.records %}
                 <tr>
-                    <td>{{ record.emp_name }} {% if record.shift_name %}<a class="clone" data-emp="{{ record.emp_doc_name }}" data-emp-name="{{ record.emp_name }}" data-date="{{ record.date }}" data-shift="{{ record.shift_name }}"><i class="fa fa-clone"></i></a>{% endif %}</td>
+                    <td>{{ record.emp_name }} {% if record.shift_name %}<a class="clone" data-emp="{{ record.emp_doc_name }}" data-emp-name="{{ record.emp_name }}" data-date="{{ record.date }}" data-shift="{{ record.shift_name }}"><i class="fa fa-clone"></i></a>{% if record.notes %}<span class="d-inline-block" tabindex="0" data-toggle="tooltip" title="{{ record.notes }}"><i class="fa fa-comment" style="color: chocolate; margin-left: 5px;"></i></span>{% endif %}{% endif %}</td>
                     <td>{{ record.designation }}</td> 
                     {% if record.shift_name %}
-                        <td style="padding: 0;"><a class="btn btn-primary btn-block btn-reschedule" style="border-radius: 0" data-shift-assignment="{{ record.shift_assignment_name }}">{{ record.shift_name }}</a></td>
+                        <td style="padding: 0;"><a class="btn btn-primary btn-block btn-reschedule btn-sm" style="border-radius: 0" data-shift-assignment="{{ record.shift_assignment_name }}">{{ record.shift_name }}</a></td>
                     {% else %}
                         {% if record.status == "on_leave" %}
-                            <td style="padding: 0;"><a class="btn btn-warning btn-block" data-emp="{{ record.emp_doc_name }}" data-emp-name="{{ record.emp_name }}" data-date="{{ record.date }}" style="border-radius: 0">{{ __("On Leave") }}</a></td>
+                            <td style="padding: 0;"><a class="btn btn-warning btn-block btn-sm" data-emp="{{ record.emp_doc_name }}" data-emp-name="{{ record.emp_name }}" data-date="{{ record.date }}" style="border-radius: 0">{{ __("On Leave") }}</a></td>
                         {% else %}
                             {% if record.status == "holiday" %}
-                                <td style="padding: 0;"><a class="btn btn-danger btn-block" data-emp="{{ record.emp_doc_name }}" data-emp-name="{{ record.emp_name }}" data-date="{{ record.date }}" style="border-radius: 0">{{ __("Holiday") }}</a></td>
+                                <td style="padding: 0;"><a class="btn btn-danger btn-block btn-sm" data-emp="{{ record.emp_doc_name }}" data-emp-name="{{ record.emp_name }}" data-date="{{ record.date }}" style="border-radius: 0">{{ __("Holiday") }}</a></td>
                             {% else %}
-                                <td style="padding: 0;"><a class="btn btn-default btn-block btn-schedule" data-emp="{{ record.emp_doc_name }}" data-emp-name="{{ record.emp_name }}" data-date="{{ record.date }}" style="border-radius: 0">{{ __("Assign Shift") }}</a></td>
+                                <td style="padding: 0;"><a class="btn btn-default btn-block btn-schedule btn-sm" data-emp="{{ record.emp_doc_name }}" data-emp-name="{{ record.emp_name }}" data-date="{{ record.date }}" style="border-radius: 0">{{ __("Assign Shift") }}</a></td>
                             {% endif %}
                         {% endif %}
                     {% endif %}
@@ -72,7 +75,7 @@ a.clone i{
                             {% for filled_hour in record.filled_hours %}
                                 {% if parseInt(filled_hour.hour) == parseInt(hour) %}
                                     {% exist = true %}
-                                    <td class="fill">
+                                    <td class="fill" style="background-color: {{ filled_hour.color }};">
                                         {% if filled_hour.is_edge %}
                                             {{ filled_hour.hour }}
                                         {% endif %}

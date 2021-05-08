@@ -5,6 +5,28 @@
 frappe.query_reports["VAT Return"] = {
 	"filters": [
 		{
+			"fieldname": "company",
+			"label": __("Company"),
+			"fieldtype": "Link",
+			"options": "Company",
+			"default": frappe.defaults.get_user_default("Company"),
+			"reqd": 1
+		},
+		{
+			"fieldname": "sales_taxes_and_charges_template",
+			"label": __("Sales Taxes and Charges Template"),
+			"fieldtype": "Link",
+			"options": "Sales Taxes and Charges Template",
+			"reqd": 1
+		},
+		{
+			"fieldname": "purchase_taxes_and_charges_template",
+			"label": __("Purchase Taxes and Charges Template"),
+			"fieldtype": "Link",
+			"options": "Purchase Taxes and Charges Template",
+			"reqd": 1
+		},
+		{
 			"fieldname": "from_date",
 			"label": __("From Date"),
 			"fieldtype": "Date",

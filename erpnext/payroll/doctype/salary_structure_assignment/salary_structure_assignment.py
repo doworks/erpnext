@@ -45,6 +45,7 @@ class SalaryStructureAssignment(Document):
 		self.deductions = salary_structure.deductions
 		self.calculate_totals()
 
+	@frappe.whitelist()
 	def calculate_totals(self):
 		#Get Salary Structure
 		_salary_structure_doc = frappe.get_doc('Salary Structure', self.salary_structure)
@@ -166,6 +167,13 @@ def get_assigned_salary_structure(employee, on_date):
 			'on_date': on_date,
 		})
 	return salary_structure[0][0] if salary_structure else None
+
+@frappe.whitelist()
+def get_employee_currency(employee):
+	employee_currency = frappe.db.get_value('Salary Structure Assignment', {'employee': employee}, 'currency')
+	if not employee_currency:
+		frappe.throw(_("There is no Salary Structure assigned to {0}. First assign a Salary Stucture.").format(employee))
+	return employee_currency
 
 @frappe.whitelist()
 def make_salary_slip(source_name, target_doc = None, employee = None, as_print = False, print_format = None, for_preview=0, ignore_permissions=False):

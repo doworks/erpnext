@@ -6,15 +6,13 @@ import frappe
 from frappe.utils import flt
 from frappe import msgprint, _
 from frappe.model.meta import get_field_precision
-from erpnext import get_default_company
 from erpnext.controllers.taxes_and_totals import get_itemised_tax
 from pprint import pprint
 
 def execute(filters):
 	if not filters: filters = frappe._dict({})
-	filters.setdefault('company', get_default_company())
-	sales_template = frappe.get_doc('Sales Taxes and Charges Template', frappe.db.get_single_value('VAT Return Settings', 'sales_taxes_and_charges_template'))
-	purchase_template = frappe.get_doc('Purchase Taxes and Charges Template', frappe.db.get_single_value('VAT Return Settings', 'purchase_taxes_and_charges_template'))
+	sales_template = frappe.get_doc('Sales Taxes and Charges Template', filters.get('sales_taxes_and_charges_template'))#frappe.get_doc('Sales Taxes and Charges Template', frappe.db.get_single_value('VAT Return Settings', 'sales_taxes_and_charges_template'))
+	purchase_template = frappe.get_doc('Purchase Taxes and Charges Template', filters.get('purchase_taxes_and_charges_template'))#frappe.get_doc('Purchase Taxes and Charges Template', frappe.db.get_single_value('VAT Return Settings', 'purchase_taxes_and_charges_template'))
 
 	columns = []
 	data = []

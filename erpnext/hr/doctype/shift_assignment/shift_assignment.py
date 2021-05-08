@@ -22,17 +22,25 @@ class ShiftAssignment(Document):
 		if not self.name:
 			self.name = "New Shift Assignment"
 
+		#condition = """and (
+		#		end_date is null
+		#		or
+		#			%(start_date)s between start_date and end_date
+		#"""
 		condition = """and (
 				end_date is null
 				or
-					%(start_date)s between start_date and end_date
+					%(start_date)s = start_date
 		"""
 
 		if self.end_date:
+			#condition  += """ or
+			#		%(end_date)s between start_date and end_date
+			#		or
+			#		start_date between %(start_date)s and %(end_date)s
+			#	) """
 			condition  += """ or
-					%(end_date)s between start_date and end_date
-					or
-					start_date between %(start_date)s and %(end_date)s
+					%(end_date)s = end_date
 				) """
 		else:
 			condition += """ ) """
@@ -107,6 +115,8 @@ def add_assignments(events, start, end, conditions=None):
 		while daily_event_start <= daily_event_end:
 			start_timing = frappe.utils.get_datetime(daily_event_start)+ shift_timing_map[d.shift_type]['start_time']
 			end_timing = frappe.utils.get_datetime(daily_event_start)+ shift_timing_map[d.shift_type]['end_time']
+			if shift_timing_map[d.shift_type]['in_two_days']:
+				end_timing = frappe.utils.add_days(end_timing, 1)
 			daily_event_start += delta
 			e = {
 				"name": d.name,
@@ -125,7 +135,7 @@ def add_assignments(events, start, end, conditions=None):
 
 def get_shift_type_timing(shift_types):
 	shift_timing_map = {}
-	data = frappe.get_all("Shift Type", filters = {"name": ("IN", shift_types)}, fields = ['name', 'start_time', 'end_time'])
+	data = frappe.get_all("Shift Type", filters = {"name": ("IN", shift_types)}, fields = ['name', 'start_time', 'end_time', 'in_two_days', 'calculate_attendance_date_as_per'])
 
 	for d in data:
 		shift_timing_map[d.name] = d
